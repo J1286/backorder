@@ -69,7 +69,59 @@ async function showApp() {
 
 let data = [];
 
-async function loadOrders(){
+function mapDBRow(row) {
+  return {
+    _id: row.id,
+
+    "DShipper ID": row.dshipper_id || "",
+    "Tr.Orig.No.": row.tr_orig_no || "",
+    "Cust. PO No.": row.cust_po_no || "",
+
+    "Item ID 1": row.item_id_1 || "",
+    "Qty 1": row.qty_1 || "",
+    "Price 1": row.price_1 || "",
+
+    "Item ID 2": row.item_id_2 || "",
+    "Qty 2": row.qty_2 || "",
+    "Price 2": row.price_2 || "",
+
+    "Item ID 3": row.item_id_3 || "",
+    "Qty 3": row.qty_3 || "",
+    "Price 3": row.price_3 || "",
+
+    "Item ID 4": row.item_id_4 || "",
+    "Qty 4": row.qty_4 || "",
+    "Price 4": row.price_4 || "",
+
+    "Item ID 5": row.item_id_5 || "",
+    "Qty 5": row.qty_5 || "",
+    "Price 5": row.price_5 || "",
+
+    "Ship Name": cleanText(row.ship_name) || "",
+    "Ship Addr1": cleanText(row.ship_addr1) || "",
+    "Ship Addr2": row.ship_addr2 || "",
+    "Ship City": row.ship_city || "",
+    "Ship State": row.ship_state || "",
+    "Ship Zip": row.ship_zip || "",
+    "Ship Country": row.ship_country || "",
+    "Ship Phone": row.ship_phone || "",
+    "Ship Email": row.ship_email || "",
+    "Ship Service": row.ship_service || "",
+    "Ship Ins.": row.ship_ins || "",
+    "Ship COD": row.ship_cod || "",
+    "Ship Confirm.": row.ship_confirm || "",
+    "Ship From": row.ship_from || "",
+    "Ship Acct": row.ship_acct || "",
+
+    _notes: row.notes || "",
+
+    _meta: {
+      updatedAt: row.updated_at
+    }
+  };
+}
+
+async function loadOrders() {
 
   const { data: rows, error } =
     await supabaseClient
@@ -77,60 +129,12 @@ async function loadOrders(){
       .select("*")
       .order("created_at");
 
-  if(error){
+  if (error) {
     console.error(error);
     return;
   }
 
-  data = rows.map(row => ({
-  _id: row.id,
-
-  "DShipper ID": row.dshipper_id || "",
-  "Tr.Orig.No.": row.tr_orig_no || "",
-  "Cust. PO No.": row.cust_po_no || "",
-
-  "Item ID 1": row.item_id_1 || "",
-  "Qty 1": row.qty_1 || "",
-  "Price 1": row.price_1 || "",
-
-  "Item ID 2": row.item_id_2 || "",
-  "Qty 2": row.qty_2 || "",
-  "Price 2": row.price_2 || "",
-
-  "Item ID 3": row.item_id_3 || "",
-  "Qty 3": row.qty_3 || "",
-  "Price 3": row.price_3 || "",
-
-  "Item ID 4": row.item_id_4 || "",
-  "Qty 4": row.qty_4 || "",
-  "Price 4": row.price_4 || "",
-
-  "Item ID 5": row.item_id_5 || "",
-  "Qty 5": row.qty_5 || "",
-  "Price 5": row.price_5 || "",
-
-  "Ship Name": cleanText(row.ship_name) || "",
-  "Ship Addr1": cleanText(row.ship_addr1) || "",
-  "Ship Addr2": row.ship_addr2 || "",
-  "Ship City": row.ship_city || "",
-  "Ship State": row.ship_state || "",
-  "Ship Zip": row.ship_zip || "",
-  "Ship Country": row.ship_country || "",
-  "Ship Phone": row.ship_phone || "",
-  "Ship Email": row.ship_email || "",
-  "Ship Service": row.ship_service || "",
-  "Ship Ins.": row.ship_ins || "",
-  "Ship COD": row.ship_cod || "",
-  "Ship Confirm.": row.ship_confirm || "",
-  "Ship From": row.ship_from || "",
-  "Ship Acct": row.ship_acct || "",
-
-  _notes: row.notes || "",
-
-  _meta: {
-    updatedAt: row.updated_at
-  }
-}));
+  data = rows.map(mapDBRow);
 
   updateDashboard();
   renderTable();
@@ -1593,9 +1597,67 @@ function showReadme(){
     document.getElementById("readmeModal").style.display = "block";
 }
 
-function startRealtime(){
+function handleRealtimeUpdate(payload) {
 
-  if(realtimeChannel){
+  const eventType = payload.eventType;
+
+  // DELETE uses payload.old
+  // INSERT/UPDATE use payload.new
+  const dbRow =
+    eventType === "DELETE"
+      ? payload.old
+      : payload.new;
+
+  if (!dbRow || !dbRow.id) {
+    console.warn("Realtime event missing row ID:", payload);
+    return;
+  }
+
+  const index = data.findIndex(
+    row => row._id === dbRow.id
+  );
+
+  if (eventType === "INSERT") {
+
+    if (index === -1) {
+      data.push(mapDBRow(dbRow));
+    }
+
+  }
+
+  else if (eventType === "UPDATE") {
+
+    const newRow = mapDBRow(dbRow);
+
+    if (index !== -1) {
+
+      // Preserve local UI-only properties
+      newRow._marked = data[index]._marked;
+
+      data[index] = newRow;
+
+    } else {
+
+      // Row doesn't exist locally for some reason
+      data.push(newRow);
+    }
+
+  }
+
+  else if (eventType === "DELETE") {
+
+    if (index !== -1) {
+      data.splice(index, 1);
+    }
+  }
+
+  updateDashboard();
+  renderTable();
+}
+
+function startRealtime() {
+
+  if (realtimeChannel) {
     return;
   }
 
@@ -1608,24 +1670,25 @@ function startRealtime(){
         schema: "public",
         table: "orders"
       },
-      async (payload)=>{
+      (payload) => {
 
-        console.log("Realtime event:", payload.new.id); 
+        console.log(
+          "Realtime event:",
+          payload.eventType
+        );
 
-        await loadOrders();
+        handleRealtimeUpdate(payload);
 
         showToast(
           payload.eventType === "INSERT"
-          ? "New order added"
-          :
-          payload.eventType === "UPDATE"
-          ? "Order updated"
-          :
-          "Order deleted"
+            ? "New order added"
+            : payload.eventType === "UPDATE"
+              ? "Order updated"
+              : "Order deleted"
         );
       }
     )
-    .subscribe((status)=>{
+    .subscribe((status) => {
       console.log("Realtime status:", status);
     });
 }
