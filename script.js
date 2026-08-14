@@ -1052,50 +1052,62 @@ function showToast(msg) {
 }
 
 // ======= Undo / Redo =======
-async function undo(){
+async function undo() {
 
     const action = undoStack.pop();
     console.log("UNDO ACTION:", action);
-    if(!action){
+
+    if (!action) {
         showToast("Nothing to undo");
         return;
     }
 
+    // =========================
+    // BULK DELETE UNDO
+    // =========================
     if (action.action === "BULK_DELETE") {
-      for (const oldRow of action.rows) {
 
-        const restoreRow = structuredClone(oldRow);
-        delete restoreRow._id;
-        delete restoreRow._meta;
-        const inserted = await insertOrder(restoreRow);
+        for (const oldRow of action.rows) {
 
-        if (inserted) {
-            await addLog({
-                orderId: inserted.id,
-                action: "RESTORE"
-            });
+            const restoreRow = structuredClone(oldRow);
+
+            delete restoreRow._id;
+            delete restoreRow._meta;
+
+            const inserted = await insertOrder(restoreRow);
+
+            if (inserted) {
+                await addLog({
+                    orderId: inserted.id,
+                    action: "RESTORE"
+                });
+            }
         }
+
+        await loadOrders();
+        showToast(`${action.rows.length} orders restored`);
+        updateUndoButtons();
+        return;
     }
 
-    await loadOrders();
-    showToast(`${action.rows.length} orders restored`);
-    updateUndoButtons();
-    return;
-}
-
-    if(action.action === "DELETE"){
+    // =========================
+    // DELETE UNDO
+    // =========================
+    if (action.action === "DELETE") {
 
         const restoreRow = structuredClone(action.oldData);
+
         delete restoreRow._id;
         delete restoreRow._meta;
 
         console.log("RESTORING:", restoreRow);
-        const inserted =
-            await insertOrder(restoreRow);
+
+        const inserted = await insertOrder(restoreRow);
 
         console.log("INSERT RESULT:", inserted);
 
-        if(inserted){
+        if (inserted) {
+
             redoStack.push({
                 ...action,
                 orderId: inserted.id
@@ -1103,29 +1115,36 @@ async function undo(){
 
             await addLog({
                 orderId: inserted.id,
-                action:"RESTORE"
+                action: "RESTORE"
             });
+
             await loadOrders();
             updateUndoButtons();
             showToast("Order restored");
         }
+
         return;
     }
 
-    // Normal field undo
+    // =========================
+    // NORMAL FIELD UNDO
+    // =========================
     const row = data.find(
         r => r._id === action.orderId
     );
-    if(!row){
+
+    if (!row) {
         showToast("Order no longer exists");
         return;
     }
 
     redoStack.push(action);
+
     row[action.field] = action.oldValue;
 
     await updateOrder(row);
     await loadOrders();
+
     showToast("Undo completed");
     updateUndoButtons();
 }
