@@ -653,52 +653,53 @@ tr.appendChild(actionTd);
       select.focus();
 
       select.addEventListener("change", async () => {
-        const oldValue = row._notes || "";
-        const newValue = select.value;
+    const oldValue = row._notes || "";
+    const newValue = select.value;
 
-      addUndoAction({
+    addUndoAction({
         action: "UPDATE",
         orderId: row._id,
         field: "_notes",
         oldValue,
         newValue
-      });
+    });
 
-row._notes = newValue;
+    row._notes = newValue;
 
-row._meta = row._meta || {};
-row._meta.updatedAt = new Date().toISOString();
+    row._meta = row._meta || {};
+    row._meta.updatedAt = new Date().toISOString();
 
-// Update visible text immediately
-textSpan.innerText = newValue;
+    // Update visible text immediately
+    textSpan.innerText = newValue;
 
-// Update color immediately
-const cls = getNoteClass(newValue);
-notesTd.className = cls ? `notes ${cls}` : "notes";
+    // Update color immediately
+    const cls = getNoteClass(newValue);
+    notesTd.className = cls ? `notes ${cls}` : "notes";
 
-// Remove dropdown immediately
-safeRemove(select);
+    // Remove dropdown immediately
+    safeRemove(select);
 
-// Save in background
-await Promise.all([
-  updateOrder(row),
-  addLog({
-    orderId: row._id,
-    action: "UPDATE",
-    fieldName: "Notes",
-    oldValue,
-    newValue
-  })
-]);
-      });
+    // Save in background
+    await Promise.all([
+        updateOrder(row),
+        addLog({
+            orderId: row._id,
+            action: "UPDATE",
+            fieldName: "Notes",
+            oldValue,
+            newValue
+        })
+    ]);
+}); 
 
-  select.addEventListener("blur", () => {
+select.addEventListener("blur", () => {
     setTimeout(() => {
         safeRemove(select);
     }, 100);
 });
-    });
 
+}); 
+    
     tr.appendChild(notesTd);
 
     // Data columns
@@ -769,7 +770,6 @@ await Promise.all([
   
   tbody.appendChild(fragment);
  }
-}
 
 async function showHistory(orderId){
 
