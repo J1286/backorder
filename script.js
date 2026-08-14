@@ -669,21 +669,27 @@ row._notes = newValue;
 row._meta = row._meta || {};
 row._meta.updatedAt = new Date().toISOString();
 
+// Update visible text immediately
+textSpan.innerText = newValue;
+
+// Update color immediately
 const cls = getNoteClass(newValue);
 notesTd.className = cls ? `notes ${cls}` : "notes";
 
-await addLog({
-  orderId: row._id,
-  action: "UPDATE",
-  fieldName: "Notes",
-  oldValue,
-  newValue
-});
-
-await updateOrder(row);
-
+// Remove dropdown immediately
 safeRemove(select);
-});
+
+// Save in background
+await Promise.all([
+  updateOrder(row),
+  addLog({
+    orderId: row._id,
+    action: "UPDATE",
+    fieldName: "Notes",
+    oldValue,
+    newValue
+  })
+]);
 
   select.addEventListener("blur", () => {
     setTimeout(() => {
