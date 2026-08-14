@@ -690,6 +690,7 @@ await Promise.all([
     newValue
   })
 ]);
+      });
 
   select.addEventListener("blur", () => {
     setTimeout(() => {
