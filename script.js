@@ -767,6 +767,7 @@ await Promise.all([
   });
   
   tbody.appendChild(fragment);
+ }
 }
 
 async function showHistory(orderId){
