@@ -1034,24 +1034,26 @@ async function deleteMarkedRows() {
 
   if (!confirm(`Delete ${marked.length} selected order(s)?`)) return;
 
-  // Save one undo action
+  // Save undo action
   addUndoAction({
     action: "BULK_DELETE",
     rows: marked.map((row) => structuredClone(row))
   });
 
-  // Create history logs
-  for (const row of marked) {
-    await addLog({
-      orderId: row._id,
-      action: "DELETE"
-    });
-  }
-
-  // Delete from database
+  // IDs to delete
   const ids = marked.map((row) => row._id);
 
+  // Create all logs in ONE database request
+  await addBulkLogs(
+    marked.map((row) => ({
+      orderId: row._id,
+      action: "DELETE"
+    }))
+  );
+
+  // Delete all orders in ONE database request
   const success = await deleteOrdersFromDB(ids);
+
   if (!success) {
     showToast("Delete failed");
     return;
@@ -1059,6 +1061,7 @@ async function deleteMarkedRows() {
 
   // Refresh table
   await loadOrders();
+
   showToast(`${marked.length} orders deleted`);
 }
 
