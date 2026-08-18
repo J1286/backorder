@@ -57,6 +57,8 @@ async function showApp() {
 }
 
 let data = [];
+let currentPage = 1;
+let rowsPerPage = 50; // Change to 100 if prefer
 
 function mapDBRow(row) {
   return {
@@ -340,6 +342,20 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (e.target === modal) modal.style.display = "none";
   });
 
+  const rowsPerPageSelect = document.getElementById("rowsPerPage");
+
+  if (rowsPerPageSelect) {
+    rowsPerPageSelect.value = rowsPerPage;
+
+    rowsPerPageSelect.addEventListener("change", () => {
+      rowsPerPage = parseInt(rowsPerPageSelect.value, 10);
+
+      currentPage = 1;
+
+      renderTable();
+    });
+  }
+
   document.getElementById("loginBox").addEventListener("keydown", (e) => {
     if (e.key === "Enter") {
       login();
@@ -476,7 +492,21 @@ function renderTable() {
     });
   }
 
-  filteredData.forEach(({ row, index }, rowIndex) => {
+  // ===== Pagination =====
+  const totalRows = filteredData.length;
+  const totalPages = Math.max(1, Math.ceil(totalRows / rowsPerPage));
+
+  // Keep current page valid
+  if (currentPage > totalPages) {
+    currentPage = totalPages;
+  }
+
+  const startIndex = (currentPage - 1) * rowsPerPage;
+  const endIndex = startIndex + rowsPerPage;
+
+  const pageData = filteredData.slice(startIndex, endIndex);
+
+  pageData.forEach(({ row, index }, rowIndex) => {
     const tr = document.createElement("tr");
 
     const updatedAt = row._meta?.updatedAt;
@@ -490,7 +520,7 @@ function renderTable() {
 
     // Row number
     const numberTd = document.createElement("td");
-    numberTd.innerText = rowIndex + 1;
+    numberTd.innerText = startIndex + rowIndex + 1;
     tr.appendChild(numberTd);
 
     // Actions column
@@ -741,6 +771,59 @@ function renderTable() {
   });
 
   tbody.appendChild(fragment);
+
+  renderPagination(totalRows, totalPages);
+}
+
+function renderPagination(totalRows, totalPages) {
+  const container = document.getElementById("pagination");
+
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  const start = totalRows === 0 ? 0 : (currentPage - 1) * rowsPerPage + 1;
+
+  const end = Math.min(currentPage * rowsPerPage, totalRows);
+
+  // Row information
+  const info = document.createElement("span");
+  info.innerText = `Showing ${start}-${end} of ${totalRows}`;
+  info.style.marginRight = "15px";
+
+  // Previous button
+  const prevBtn = document.createElement("button");
+  prevBtn.innerText = "Previous";
+  prevBtn.disabled = currentPage === 1;
+
+  prevBtn.onclick = () => {
+    if (currentPage > 1) {
+      currentPage--;
+      renderTable();
+    }
+  };
+
+  // Page number
+  const pageInfo = document.createElement("span");
+  pageInfo.innerText = ` Page ${currentPage} of ${totalPages} `;
+  pageInfo.style.margin = "0 10px";
+
+  // Next button
+  const nextBtn = document.createElement("button");
+  nextBtn.innerText = "Next";
+  nextBtn.disabled = currentPage === totalPages;
+
+  nextBtn.onclick = () => {
+    if (currentPage < totalPages) {
+      currentPage++;
+      renderTable();
+    }
+  };
+
+  container.appendChild(info);
+  container.appendChild(prevBtn);
+  container.appendChild(pageInfo);
+  container.appendChild(nextBtn);
 }
 
 async function showHistory(orderId) {
