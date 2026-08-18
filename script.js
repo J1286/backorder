@@ -426,14 +426,58 @@ function renderHeaders() {
   const headerRow = document.getElementById("headerRow");
 
   headerRow.innerHTML =
-    "<th>#</th><th>Actions</th><th>Notes</th>" +
+    "<th>#</th>" +
+    `<th>
+      <label style="
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        white-space: nowrap;
+      ">
+        <input
+          type="checkbox"
+          id="selectAllCheckbox"
+          title="Select all rows on this page"
+        >
+        <span>Actions</span>
+      </label>
+    </th>` +
+    "<th>Notes</th>" +
     columns.map((col) => `<th>${col}</th>`).join("") +
     `<th id="updatedHeader" style="cursor:pointer;">Updated</th>`;
+
   document.getElementById("updatedHeader").addEventListener("click", () => {
     sortByUpdated = true;
-    sortAsc = !sortAsc; // toggle asc/desc
+    sortAsc = !sortAsc;
     loadOrders();
   });
+
+  const selectAllCheckbox = document.getElementById("selectAllCheckbox");
+
+  if (selectAllCheckbox) {
+    selectAllCheckbox.addEventListener("change", () => {
+      const checked = selectAllCheckbox.checked;
+
+      document.querySelectorAll("#tableBody tr").forEach((tr) => {
+        const id = tr.dataset.id;
+
+        const row = data.find((r) => r._id === id);
+
+        if (row) {
+          row._marked = checked;
+        }
+
+        const checkbox = tr.querySelector(
+          ".actions-column input[type='checkbox']"
+        );
+
+        if (checkbox) {
+          checkbox.checked = checked;
+        }
+      });
+    });
+  }
 }
 
 function formatTime(iso) {
@@ -508,6 +552,7 @@ function renderTable() {
 
   pageData.forEach(({ row, index }, rowIndex) => {
     const tr = document.createElement("tr");
+    tr.dataset.id = row._id;
 
     const updatedAt = row._meta?.updatedAt;
     if (updatedAt) {
@@ -525,6 +570,7 @@ function renderTable() {
 
     // Actions column
     const actionTd = document.createElement("td");
+    actionTd.className = "actions-column";
 
     const actionBox = document.createElement("div");
     actionBox.className = "action-box";
