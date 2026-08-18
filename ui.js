@@ -1,3 +1,51 @@
+function showDashboard() {
+  document.getElementById("dashboardPage").style.display = "block";
+  document.getElementById("ordersPage").style.display = "none";
+
+  updateDashboard();
+}
+
+function showOrders() {
+  document.getElementById("dashboardPage").style.display = "none";
+  document.getElementById("ordersPage").style.display = "block";
+}
+
+function updateDashboard() {
+  const total = data.length;
+
+  let redline = 0;
+  let ecs = 0;
+  let tdot = 0;
+  let others = 0;
+
+  data.forEach((row) => {
+    const dealer = (row["DShipper ID"] || "").trim().toUpperCase();
+
+    switch (dealer) {
+      case "W7232":
+        redline++;
+        break;
+
+      case "W6938":
+        ecs++;
+        break;
+
+      case "W7290":
+        tdot++;
+        break;
+
+      default:
+        others++;
+    }
+  });
+
+  document.getElementById("totalOrders").innerText = total;
+  document.getElementById("redlineOrders").innerText = redline;
+  document.getElementById("ecsOrders").innerText = ecs;
+  document.getElementById("tdotOrders").innerText = tdot;
+  document.getElementById("otherOrders").innerText = others;
+}
+
 function showToast(msg) {
   let toast = document.createElement("div");
   toast.innerText = msg;
