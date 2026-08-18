@@ -24,9 +24,10 @@
 - ✅ Undo/Redo
 - ✅ Delete log
 - ✅ Bulk Delete
+- ✅ Select All
+- ✅ Rows per page
 
 ## Planned Features
 
 - Dashboard updates
-- Select all
 - Readme in separate HTML or Markdown file
