@@ -185,3 +185,61 @@ function saveState() {
   if (undoStack.length > 50) undoStack.shift();
   redoStack = [];
 }
+
+// ======= Paste Handling =======
+document.addEventListener("paste", async (e) => {
+  const active = document.activeElement;
+  if (!active || active.tagName !== "TD") return;
+  if (!active.dataset.col) return;
+
+  e.preventDefault();
+
+  const clipboard = e.clipboardData.getData("text/plain");
+  if (!clipboard) return;
+
+  const rows = clipboard
+    .split(/\r?\n/)
+    .filter((r) => r.trim() !== "")
+    .map((r) => r.split("\t"));
+
+  const startId = active.dataset.id;
+  const startIndex = data.findIndex((r) => r._id === startId);
+
+  const startCol = parseInt(active.dataset.col);
+  if (startIndex === -1 || isNaN(startCol)) return;
+
+  saveState();
+
+  const changedRows = new Set();
+
+  for (const [rIndex, r] of rows.entries()) {
+    const targetIndex = startIndex + rIndex;
+
+    if (targetIndex >= data.length) {
+      const newRow = createEmptyRow();
+      data.push(newRow);
+      await insertOrder(newRow);
+    }
+
+    const row = data[targetIndex];
+
+    r.forEach((val, cIndex) => {
+      const colIndex = startCol + cIndex;
+
+      if (colIndex < columns.length) {
+        row[columns[colIndex]] = val;
+      }
+    });
+
+    row._meta = row._meta || {};
+    row._meta.updatedAt = new Date().toISOString();
+
+    changedRows.add(row);
+  }
+
+  for (const row of changedRows) {
+    await updateOrder(row);
+  }
+
+  await loadOrders();
+});
