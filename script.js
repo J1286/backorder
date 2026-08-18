@@ -1620,6 +1620,8 @@ function showReadme() {
 <li>✅ Undo/Redo</li>
 <li>✅ Delete logs</li>
 <li>✅ Bulk Delete</li>
+<li>✅ Select All/li>
+<li>✅ Rows per page</li>
 </ul>
 
 <h3>Planned Features</h3>
