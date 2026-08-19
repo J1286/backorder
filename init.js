@@ -1,13 +1,4 @@
-async function showApp() {
-  document.getElementById("loginBox").style.display = "none";
-  document.getElementById("app").style.display = "block";
-
-  await loadOrders();
-  showOrders();
-
-  startRealtime();
-}
-
+// GLOBAL
 let data = [];
 let currentPage = 1;
 let rowsPerPage = 50; 
@@ -138,3 +129,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   await checkLogin();
 });
+
+async function showApp() {
+  document.getElementById("loginBox").style.display = "none";
+  document.getElementById("app").style.display = "block";
+
+  await loadOrders();
+  showOrders();
+
+  startRealtime();
+}
