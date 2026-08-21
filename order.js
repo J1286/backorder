@@ -237,7 +237,7 @@ function copyRow(id) {
     })
     .catch((err) => {
       console.error("Copy failed:", err);
-      alert("Copy failed");
+      showtoast("Copy failed");
     });
 }
 
