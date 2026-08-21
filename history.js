@@ -71,7 +71,7 @@ async function showHistory(orderId) {
   }
 
   if (!logs.length) {
-    alert("No history found");
+    showtoast("No history found");
     return;
   }
 
