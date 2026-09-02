@@ -1,9 +1,9 @@
-console.log("SCRIPT STARTED");
-
 const SUPABASE_URL = "https://adcjrkudofddvmcpmdzw.supabase.co";
 const SUPABASE_KEY = "sb_publishable_AFiJPntz0_rjCbR_x-dUbw_29b05Pol";
 
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+console.log("SCRIPT STARTED");
 
 async function login() {
   const email = document.getElementById("email").value;

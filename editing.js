@@ -1,7 +1,6 @@
 // ======= Undo / Redo =======
 async function undo() {
   const action = undoStack.pop();
-  console.log("UNDO ACTION:", action);
 
   if (!action) {
     showToast("Nothing to undo");
@@ -39,11 +38,7 @@ async function undo() {
     delete restoreRow._id;
     delete restoreRow._meta;
 
-    console.log("RESTORING:", restoreRow);
-
     const inserted = await insertOrder(restoreRow);
-
-    console.log("INSERT RESULT:", inserted);
 
     if (inserted) {
       redoStack.push({

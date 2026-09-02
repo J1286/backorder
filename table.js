@@ -337,7 +337,6 @@ function renderTable() {
       });
 
       td.addEventListener("blur", async () => {
-        console.log("CELL BLUR", col);
 
         if (td.dataset.before !== td.innerText) {
           const id = td.dataset.id;

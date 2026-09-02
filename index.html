@@ -78,6 +78,83 @@
           <div class="dashboard-value" id="otherOrders">0</div>
         </div>
       </div>
+
+      <!-- Price Database -->
+      <div id="priceDatabasePanel" class="price-database-panel">
+
+        <div class="price-database-header">
+          <div>
+            <h2>💰 Price Database</h2>
+            <div id="priceDatabaseStatus">
+              🟡 Loading...
+            </div><br>
+
+            <div class="price-database-actions">
+              <button onclick="loadPriceDatabase()">
+                🔄 Refresh
+              </button>
+
+              <button onclick="document.getElementById('priceExcelInput').click()">
+                📤 Upload Price Excel
+              </button>
+
+              <input type="file" id="priceExcelInput" accept=".xlsx,.xls,.csv" style="display:none;" onchange="handlePriceExcelUpload(event)">
+            </div>
+          </div>
+        </div>
+
+        <hr>
+
+        <div class="price-search">
+          <label for="priceSearchInput">
+            Search SKU
+          </label>
+
+          <input type="text" id="priceSearchInput" placeholder="Enter SKU..." autocomplete="off">
+
+          <button onclick="searchPrices()">
+            🔍 Search
+          </button>
+        </div>
+
+        <div id="priceSearchStatus"></div>
+
+        <div id="priceResultsContainer">
+
+          <table id="priceResultsTable">
+            <colgroup>
+              <col class="sku-column">
+              <col class="price-column">
+              <col class="price-column">
+              <col class="price-column">
+              <col class="price-column">
+              <col class="price-column">
+            </colgroup>
+
+            <thead>
+              <tr id="priceResultsHeader"></tr>
+            </thead>
+
+            <tbody id="priceResultsBody"></tbody>
+          </table>
+
+          <thead>
+            <tr id="priceResultsHeader"></tr>
+          </thead>
+
+          <tbody id="priceResultsBody"></tbody>
+          </table>
+
+          <div id="pricePagination" style="
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:8px;
+    padding:12px;
+  "></div>
+
+        </div>
+      </div>
     </div>
 
     <!-- Orders Page -->
@@ -190,6 +267,8 @@
   <script src="order.js"></script>
   <script src="table.js"></script>
   <script src="auth.js"></script>
+  <script src="priceManager.js"></script>
+  <script src="priceImport.js"></script>
   <script src="history.js"></script>
 
 </body>

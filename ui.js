@@ -3,6 +3,9 @@ function showDashboard() {
   document.getElementById("ordersPage").style.display = "none";
 
   updateDashboard();
+
+  // Automatically refresh price database status
+  loadPriceDatabase();
 }
 
 function showOrders() {
@@ -96,14 +99,12 @@ function showReadme() {
 <li>✅ Bulk Delete</li>
 <li>✅ Select All/li>
 <li>✅ Rows per page</li>
+<li>✅ Dealer prices API implementation</li>
 </ul>
 
 <h3>Planned Features</h3>
 <ul>
-<li>⬜ Dashboard updates</li>
-<li>⬜ Select All</li>
 <li>⬜ Readme in a separate HTML or markdown file</li>
-<li>⬜ Separate loading from rendering</li>
 </ul>
 
 `;

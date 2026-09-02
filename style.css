@@ -273,3 +273,403 @@ select {
   font-weight: bold;
   margin-top: 8px;
 }
+
+/* Price Database */
+.price-database-panel {
+  margin-top: 20px;
+  padding: 16px;
+  background: #fff;
+  border: 1px solid #d6d6d6;
+  border-radius: 8px;
+}
+
+.price-database-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.price-database-header h2 {
+  margin: 0 0 5px 0;
+}
+
+.price-database-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.price-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 15px 0;
+}
+
+.price-search input {
+  width: 220px;
+  padding: 6px 8px;
+}
+
+/* Price results */
+
+#priceResultsContainer {
+  overflow-x: auto;
+  margin-top: 10px;
+}
+
+#priceResultsTable {
+  border-collapse: collapse;
+  table-layout: fixed;
+
+  /* Don't stretch across the whole screen */
+  width: auto;
+  min-width: 650px;
+
+  background: #fff;
+  font-size: 14px;
+}
+
+/* SKU column */
+#priceResultsTable .sku-column {
+  width: 280px;
+}
+
+/* Dealer price columns */
+#priceResultsTable .price-column {
+  width: 160px;
+}
+
+/* Header */
+#priceResultsTable thead th {
+  background: #f1f3f5;
+  color: #333;
+  font-weight: 600;
+  text-align: left;
+  padding: 9px 10px;
+  border: 1px solid #ccc;
+  white-space: nowrap;
+}
+
+/* Body */
+#priceResultsTable tbody td {
+  padding: 9px 10px;
+  border: 1px solid #ccc;
+
+  white-space: nowrap;
+}
+
+/* SKU */
+#priceResultsTable tbody td:first-child {
+  font-weight: 600;
+}
+
+/* Prices */
+#priceResultsTable tbody td:not(:first-child) {
+  text-align: right;
+  color: #222;
+}
+
+/* Slight hover effect */
+#priceResultsTable tbody tr:hover {
+  background: #f8f9fa;
+}
+
+/* Header/body alignment */
+#priceResultsTable th,
+#priceResultsTable td {
+  box-sizing: border-box;
+}
+
+/* ========================================
+   PRICE DATABASE TABLE
+======================================== */
+#priceResultsContainer {
+  margin-top: 10px;
+  overflow-x: auto;
+}
+
+#priceResultsTable {
+  border-collapse: collapse;
+  width: auto;
+  min-width: 1000px;
+  table-layout: fixed;
+
+  background: #fff;
+  font-size: 14px;
+}
+
+/* ========================================
+   COLUMN WIDTHS
+======================================== */
+#priceResultsTable .price-sku-column {
+  width: 280px;
+  min-width: 280px;
+  max-width: 280px;
+}
+
+#priceResultsTable .price-dealer-column {
+  width: 135px;
+  min-width: 135px;
+  max-width: 135px;
+}
+
+#priceResultsTable .price-actions-column {
+  width: 90px;
+  min-width: 90px;
+  max-width: 90px;
+}
+
+/* HEADER */
+#priceResultsTable thead th {
+  background: #f1f3f5;
+  color: #333;
+  font-weight: 600;
+  text-align: center;
+  padding: 9px 10px;
+  border: 1px solid #c8c8c8;
+  white-space: nowrap;
+}
+
+#priceResultsTable thead th:first-child {
+  text-align: left;
+}
+
+/* BODY */
+#priceResultsTable tbody td {
+  padding: 9px 10px;
+  border: 1px solid #d0d0d0;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+/* SKU */
+#priceResultsTable tbody .price-sku-column {
+  font-weight: 600;
+
+  text-align: left;
+}
+
+/* Prices */
+#priceResultsTable tbody .price-dealer-column {
+  text-align: right;
+
+  font-variant-numeric: tabular-nums;
+}
+
+/* Actions */
+#priceResultsTable tbody .price-actions-column {
+  text-align: center;
+}
+
+/* HOVER */
+#priceResultsTable tbody tr:hover {
+  background: #f7f9fb;
+}
+
+/* EDIT INPUTS */
+#priceResultsTable .price-edit-input {
+  width: 105px;
+
+  box-sizing: border-box;
+
+  padding: 5px 6px;
+
+  text-align: right;
+}
+
+/* ========================================
+   PRICE IMPORT PREVIEW
+======================================== */
+
+.price-import-modal {
+  width: 900px;
+  max-width: 90vw;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.price-import-close {
+  float: right;
+  font-size: 28px;
+  cursor: pointer;
+  color: #777;
+}
+
+.price-import-close:hover {
+  color: #000;
+}
+
+/* Summary */
+
+.price-import-summary {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 18px 0;
+}
+
+.import-stat {
+  min-width: 125px;
+  padding: 12px;
+  background: #f1f3f5;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.import-stat strong {
+  display: block;
+  font-size: 22px;
+  margin-bottom: 4px;
+}
+
+.import-stat span {
+  font-size: 12px;
+  color: #666;
+}
+
+.import-stat.new {
+  background: #e8f7e8;
+  color: #16803c;
+}
+
+.import-stat.changed {
+  background: #fff6d8;
+  color: #856404;
+}
+
+.import-stat.missing {
+  background: #fdeaea;
+  color: #a12622;
+}
+
+/* Change table */
+
+.price-change-table-wrapper {
+  max-height: 400px;
+  overflow: auto;
+  border: 1px solid #ddd;
+}
+
+.price-change-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.price-change-table th {
+  position: sticky;
+  top: 0;
+
+  background: #f1f3f5;
+
+  padding: 8px;
+
+  border: 1px solid #ccc;
+
+  text-align: left;
+}
+
+.price-change-table td {
+  padding: 8px;
+
+  border: 1px solid #ddd;
+}
+
+/* Price changes */
+
+.price-increase {
+  color: #b42318;
+  font-weight: 600;
+}
+
+.price-decrease {
+  color: #16803c;
+  font-weight: 600;
+}
+
+.price-removed {
+  color: #a12622;
+  font-weight: 600;
+}
+
+/* New SKUs */
+
+.new-sku-row {
+  display: flex;
+  justify-content: space-between;
+
+  padding: 7px 10px;
+
+  border-bottom: 1px solid #eee;
+}
+
+.new-sku-row span {
+  color: #16803c;
+}
+
+/* Warning */
+
+.warning-text {
+  padding: 10px;
+
+  background: #fff3cd;
+
+  border: 1px solid #ffe69c;
+
+  border-radius: 5px;
+}
+
+/* No changes */
+
+.no-price-changes {
+  padding: 20px;
+
+  background: #e8f7e8;
+
+  color: #16803c;
+
+  border-radius: 6px;
+
+  text-align: center;
+
+  font-weight: 600;
+}
+
+/* Buttons */
+
+.price-import-actions {
+  display: flex;
+
+  justify-content: flex-end;
+
+  gap: 10px;
+
+  margin-top: 20px;
+
+  padding-top: 15px;
+
+  border-top: 1px solid #ddd;
+}
+
+.apply-price-button {
+  background: #16803c;
+
+  color: white;
+
+  border: none;
+
+  padding: 8px 16px;
+
+  border-radius: 5px;
+
+  cursor: pointer;
+}
+
+.apply-price-button:hover {
+  background: #126b32;
+}
+
+.apply-price-button:disabled {
+  background: #aaa;
+
+  cursor: not-allowed;
+}
