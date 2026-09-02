@@ -26,8 +26,8 @@
 - ✅ Bulk Delete
 - ✅ Select All
 - ✅ Rows per page
+- ✅ Dealer prices API implementation
 
 ## Planned Features
 
-- Dashboard updates
 - Readme in separate HTML or Markdown file
