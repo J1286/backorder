@@ -90,16 +90,27 @@
             </div><br>
 
             <div class="price-database-actions">
-              <button onclick="loadPriceDatabase()">
-                🔄 Refresh
-              </button>
 
-              <button onclick="document.getElementById('priceExcelInput').click()">
-                📤 Upload Price Excel
-              </button>
+  	      <button onclick="loadPriceDatabase()">
+    	        🔄 Refresh
+  	      </button>
 
-              <input type="file" id="priceExcelInput" accept=".xlsx,.xls,.csv" style="display:none;" onchange="handlePriceExcelUpload(event)">
-            </div>
+ 	      <button onclick="document.getElementById('priceExcelInput').click()">
+    	        📤 Upload Price Excel
+  	      </button>
+
+	      <button onclick="exportPriceDatabase()">
+    	        📥 Export Price Excel
+  	      </button>
+
+	      <input
+    	        type="file"
+    	        id="priceExcelInput"
+    	        accept=".xlsx,.xls,.csv"
+    	        style="display:none;"
+    		onchange="handlePriceExcelUpload(event)"
+  	      >
+	     </div>
           </div>
         </div>
 
