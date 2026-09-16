@@ -73,6 +73,81 @@ async function loadPriceDatabase() {
   }
 }
 
+
+// EXPORT PRICE DATABASE TO EXCEL
+async function exportPriceDatabase() {
+  const statusEl = document.getElementById("priceDatabaseStatus");
+
+  try {
+    if (statusEl) {
+      statusEl.textContent = "🟡 Loading prices for export...";
+    }
+
+    // LOAD ALL PRICE ROWS FROM SUPABASE
+    const rows = await loadAllPriceRows();
+
+    if (!rows.length) {
+      throw new Error("No price data found to export.");
+    }
+
+    console.log("Exporting price rows:", rows.length);
+
+    // BUILD EXCEL ROWS
+    const exportRows = rows.map((row) => {
+      const exportRow = {
+        SKU: row.sku || ""
+      };
+
+      PRICE_DEALERS.forEach((dealer) => {
+        const value = normalizePriceValue(row[dealer.field]);
+
+        exportRow[dealer.label] = value === null ? "" : value;
+      });
+
+      return exportRow;
+    });
+
+    // CREATE WORKSHEET
+    const worksheet = XLSX.utils.json_to_sheet(exportRows);
+
+    // CREATE WORKBOOK
+    const workbook = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(
+      workbook,
+      worksheet,
+      "Prices"
+    );
+
+    // DOWNLOAD
+    const date = new Date().toISOString().slice(0, 10);
+
+    XLSX.writeFile(
+      workbook,
+      `price-table-${date}.xlsx`
+    );
+
+    if (statusEl) {
+      statusEl.textContent =
+        `🟢 ${rows.length} SKUs exported`;
+    }
+
+  } catch (error) {
+    console.error("Price database export failed:", error);
+
+    if (statusEl) {
+      statusEl.textContent =
+        "🔴 Price database export failed";
+    }
+
+    alert(
+      "Failed to export price database:\n\n" +
+      error.message
+    );
+  }
+}
+
+
 // SEARCH PRICES
 async function searchPrices() {
   const input = document.getElementById("priceSearchInput");
