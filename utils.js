@@ -108,34 +108,73 @@ function startRealtime() {
 
 // ======= Export / Import =======
 function exportCSV(marked = false) {
-  const exportData = marked ? data.filter((r) => r._marked) : data;
+  const exportData = marked
+    ? data.filter((r) => r._marked)
+    : data;
+
   if (!exportData.length) {
     showToast(marked ? "No rows selected" : "No data to export");
     return;
   }
 
-  const exportColumns = ["Notes", ...columns];
+  // Find the columns we want to export
+  const startColumn = columns.indexOf("DShipper ID");
+  const endColumn = columns.indexOf("Ship Acct");
+
+  if (startColumn === -1 || endColumn === -1) {
+    showToast("DShipper ID or Ship Acct column not found");
+    return;
+  }
+
+  if (startColumn > endColumn) {
+    showToast("DShipper ID must come before Ship Acct");
+    return;
+  }
+
+  // Include every column from DShipper ID through Ship Acct
+  const exportColumns = columns.slice(startColumn, endColumn + 1);
 
   const wsData = [
     exportColumns,
     ...exportData.map((r) =>
-      exportColumns.map((c) => (c === "Notes" ? r._notes || "" : r[c] || ""))
+      exportColumns.map((c) => r[c] ?? "")
     )
   ];
 
+  // Create worksheet
   const ws = XLSX.utils.aoa_to_sheet(wsData);
-  ws["!views"] = [{ state: "frozen", ySplit: 1 }];
-  ws["!cols"] = columns.map((col) => {
-    const maxLen = Math.max(
-      col.length,
-      ...exportData.map((r) => (r[col] || "").toString().length)
-    );
-    return { wch: Math.min(maxLen + 2, 40) };
-  });
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, marked ? "Marked Orders" : "Orders");
-  XLSX.writeFile(wb, marked ? "Marked_Backorders.xlsx" : "Backorders.xlsx");
+
+  // Convert worksheet directly to CSV
+  const csv = XLSX.utils.sheet_to_csv(ws);
+
+  // Create downloadable CSV blob
+  const blob = new Blob(
+    [csv],
+    { type: "text/csv;charset=utf-8;" }
+  );
+
+  // Get today's date
+  const today = new Date();
+  const month = today.getMonth() + 1;
+  const day = today.getDate();
+  const year = today.getFullYear();
+
+  const fileName = `${month}-${day}-${year} FC Batch1.csv`;
+
+  // Download
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+
+  a.href = url;
+  a.download = fileName;
+
+  document.body.appendChild(a);
+  a.click();
+
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
+
 
 function importExcel() {
   const input = document.getElementById("excelInput");
