@@ -1,4 +1,5 @@
 // ======= Rendering =======
+
 function renderHeaders() {
   const headerRow = document.getElementById("headerRow");
 
@@ -337,7 +338,6 @@ function renderTable() {
       });
 
       td.addEventListener("blur", async () => {
-
         if (td.dataset.before !== td.innerText) {
           const id = td.dataset.id;
           const rowIndex = findRowIndexById(id);
