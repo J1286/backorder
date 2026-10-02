@@ -36,8 +36,8 @@ function cleanText(value) {
 function handleRealtimeUpdate(payload) {
   const eventType = payload.eventType;
 
-  // DELETE uses payload.old
-  // INSERT/UPDATE use payload.new
+  // DELETE uses payload.old 
+  // INSERT/UPDATE uses payload.new
   const dbRow = eventType === "DELETE" ? payload.old : payload.new;
 
   if (!dbRow || !dbRow.id) {
@@ -108,9 +108,7 @@ function startRealtime() {
 
 // ======= Export / Import =======
 function exportCSV(marked = false) {
-  const exportData = marked
-    ? data.filter((r) => r._marked)
-    : data;
+  const exportData = marked ? data.filter((r) => r._marked) : data;
 
   if (!exportData.length) {
     showToast(marked ? "No rows selected" : "No data to export");
@@ -136,9 +134,7 @@ function exportCSV(marked = false) {
 
   const wsData = [
     exportColumns,
-    ...exportData.map((r) =>
-      exportColumns.map((c) => r[c] ?? "")
-    )
+    ...exportData.map((r) => exportColumns.map((c) => r[c] ?? ""))
   ];
 
   // Create worksheet
@@ -148,10 +144,7 @@ function exportCSV(marked = false) {
   const csv = XLSX.utils.sheet_to_csv(ws);
 
   // Create downloadable CSV blob
-  const blob = new Blob(
-    [csv],
-    { type: "text/csv;charset=utf-8;" }
-  );
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
 
   // Get today's date
   const today = new Date();
@@ -174,7 +167,6 @@ function exportCSV(marked = false) {
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
-
 
 function importExcel() {
   const input = document.getElementById("excelInput");
