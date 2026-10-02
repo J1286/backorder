@@ -27,6 +27,7 @@
 - ✅ Select All
 - ✅ Rows per page
 - ✅ Dealer prices API implementation
+- ✅ Price import/export API
 
 ## Planned Features
 
