@@ -165,7 +165,7 @@ async function deleteOrdersFromDB(ids) {
   return true;
 }
 
-// ======= Row Operations =======
+// ====== Row Operations ======
 async function addRow() {
   saveState();
 
