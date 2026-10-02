@@ -300,15 +300,15 @@ function comparePriceData(excelRows, databaseRows) {
 
 // COMPARE NUMBERS SAFELY
 function pricesEqual(a, b) {
-  if (a === null && b === null) {
-    return true;
-  }
+    if (a === null && b === null) {
+        return true;
+    }
 
-  if (a === null || b === null) {
-    return false;
-  }
+    if (a === null || b === null) {
+        return false;
+    }
 
-  return Math.abs(a - b) < 0.00001;
+    return Math.round(a * 100) === Math.round(b * 100);
 }
 
 // SHOW IMPORT PREVIEW
