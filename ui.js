@@ -100,6 +100,7 @@ function showReadme() {
 <li>✅ Select All/li>
 <li>✅ Rows per page</li>
 <li>✅ Dealer prices API implementation</li>
+<li>✅ Price import/export API/li>
 </ul>
 
 <h3>Planned Features</h3>
