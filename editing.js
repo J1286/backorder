@@ -7,7 +7,7 @@ async function undo() {
     return;
   }
 
-  // BULK DELETE UNDO
+  // BULK DELETE - UNDO
   if (action.action === "BULK_DELETE") {
     for (const oldRow of action.rows) {
       const restoreRow = structuredClone(oldRow);
