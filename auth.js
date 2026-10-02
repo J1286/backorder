@@ -47,11 +47,13 @@ async function checkLogin() {
 
 // ======= Display Name =======
 function showProfile() {
+  
   document.getElementById("profileModal").style.display = "block";
   loadProfile();
 }
 
 async function loadProfile() {
+  
   const { data, error } = await supabaseClient.auth.getUser();
   if (error) {
     console.error(error);
@@ -65,6 +67,7 @@ async function loadProfile() {
 }
 
 async function saveProfileName() {
+  
   const name = document.getElementById("displayNameInput").value.trim();
 
   const { error } = await supabaseClient.auth.updateUser({
