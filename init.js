@@ -1,7 +1,7 @@
 // GLOBAL
 let data = [];
 let currentPage = 1;
-let rowsPerPage = 50; 
+let rowsPerPage = 50;
 let searchQuery = "";
 let undoStack = [];
 let redoStack = [];
@@ -126,7 +126,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   renderHeaders();
-
   await checkLogin();
 });
 
