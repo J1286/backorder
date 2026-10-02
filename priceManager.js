@@ -73,7 +73,6 @@ async function loadPriceDatabase() {
   }
 }
 
-
 // EXPORT PRICE DATABASE TO EXCEL
 async function exportPriceDatabase() {
   const statusEl = document.getElementById("priceDatabaseStatus");
@@ -113,40 +112,26 @@ async function exportPriceDatabase() {
     // CREATE WORKBOOK
     const workbook = XLSX.utils.book_new();
 
-    XLSX.utils.book_append_sheet(
-      workbook,
-      worksheet,
-      "Prices"
-    );
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Prices");
 
     // DOWNLOAD
     const date = new Date().toISOString().slice(0, 10);
 
-    XLSX.writeFile(
-      workbook,
-      `price-table-${date}.xlsx`
-    );
+    XLSX.writeFile(workbook, `price-table-${date}.xlsx`);
 
     if (statusEl) {
-      statusEl.textContent =
-        `🟢 ${rows.length} SKUs exported`;
+      statusEl.textContent = `🟢 ${rows.length} SKUs exported`;
     }
-
   } catch (error) {
     console.error("Price database export failed:", error);
 
     if (statusEl) {
-      statusEl.textContent =
-        "🔴 Price database export failed";
+      statusEl.textContent = "🔴 Price database export failed";
     }
 
-    alert(
-      "Failed to export price database:\n\n" +
-      error.message
-    );
+    alert("Failed to export price database:\n\n" + error.message);
   }
 }
-
 
 // SEARCH PRICES
 async function searchPrices() {
@@ -531,8 +516,6 @@ function renderPricePagination(container) {
   };
 
   container.appendChild(previous);
-
   container.appendChild(pageLabel);
-
   container.appendChild(next);
 }
