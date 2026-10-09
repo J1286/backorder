@@ -1,5 +1,6 @@
 function showDashboard() {
   document.getElementById("dashboardPage").style.display = "block";
+  document.getElementById("inventoryDatabasePanel").style.display = "block";
   document.getElementById("ordersPage").style.display = "none";
 
   updateDashboard();
