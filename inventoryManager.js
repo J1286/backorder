@@ -1,12 +1,12 @@
 // Inventory Database: dashboard counts and SKU search.
 
 const INVENTORY_WAREHOUSES = [
-  { field: "k2_wh", label: "WH1" },
+  { field: "k2_wh", label: "K2 WH" },
   { field: "garcia", label: "Garcia" },
-  { field: "ca2_best", label: "CA2" },
-  { field: "cagl", label: "MFY" },
+  { field: "ca2_best", label: "CA2 best" },
+  { field: "cagl", label: "CAGL" },
   { field: "nj_best", label: "NJ BEST" },
-  { field: "ga2", label: "WH3" }
+  { field: "ga2", label: "GA2" }
 ];
 
 const INVENTORY_SELECT_COLUMNS = "sku,k2_wh,eta,garcia,ca2_best,cagl,nj_best,ga2,updated_at";
