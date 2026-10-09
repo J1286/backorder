@@ -1,5 +1,3 @@
-// Inventory Excel import. Requires XLSX, supabaseClient, and inventoryManager.js.
-
 function normalizeInventoryHeader(value) {
   return String(value ?? "").trim().toLowerCase().replace(/[^a-z0-9]/g, "");
 }
