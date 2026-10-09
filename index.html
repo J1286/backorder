@@ -166,6 +166,45 @@
       </div>
     </div>
 
+	<div id="inventoryDatabasePanel" class="price-database-panel">
+  <div class="price-database-header">
+    <div>
+      <h2>📦 Inventory Database</h2>
+      <div id="inventoryDatabaseStatus">🟡 Loading inventory database...</div><br>
+      <div class="price-database-actions">
+        <button onclick="loadInventoryDatabase()">🔄 Refresh</button>
+        <button onclick="document.getElementById('inventoryExcelInput').click()">📤 Upload Inventory Excel</button>
+        <input type="file" id="inventoryExcelInput" accept=".xlsx,.xls,.csv" style="display:none;" onchange="handleInventoryExcelUpload(event)">
+      </div>
+    </div>
+  </div>
+  <hr>
+
+  <h3>SKUs in stock by warehouse</h3>
+  <div id="inventoryWarehouseCounts" class="dashboard" style="margin-top:12px;">
+    <div class="dashboard-card"><div class="dashboard-title">K2 WH</div><div class="dashboard-value" id="inventoryCount_k2_wh">—</div></div>
+    <div class="dashboard-card"><div class="dashboard-title">Garcia</div><div class="dashboard-value" id="inventoryCount_garcia">—</div></div>
+    <div class="dashboard-card"><div class="dashboard-title">CA2 best</div><div class="dashboard-value" id="inventoryCount_ca2_best">—</div></div>
+    <div class="dashboard-card"><div class="dashboard-title">CAGL</div><div class="dashboard-value" id="inventoryCount_cagl">—</div></div>
+    <div class="dashboard-card"><div class="dashboard-title">NJ BEST</div><div class="dashboard-value" id="inventoryCount_nj_best">—</div></div>
+    <div class="dashboard-card"><div class="dashboard-title">GA2</div><div class="dashboard-value" id="inventoryCount_ga2">—</div></div>
+  </div>
+
+  <hr>
+  <div class="price-search">
+    <label for="inventorySearchInput">Search inventory SKU</label>
+    <input type="text" id="inventorySearchInput" placeholder="Enter SKU..." autocomplete="off">
+    <button onclick="searchInventory()">🔍 Search</button>
+  </div>
+  <div id="inventorySearchStatus">Enter a SKU to search inventory.</div>
+  <div id="inventoryResultsContainer" style="overflow-x:auto;">
+    <table id="inventoryResultsTable">
+      <thead><tr id="inventoryResultsHeader"></tr></thead>
+      <tbody id="inventoryResultsBody"></tbody>
+    </table>
+  </div>
+</div>
+
     <!-- Orders Page -->
     <div id="ordersPage">
 
