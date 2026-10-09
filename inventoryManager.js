@@ -1,13 +1,12 @@
 // Inventory Database: dashboard counts and SKU search.
-// Requires supabaseClient from auth.js and the inventory table in Supabase.
 
 const INVENTORY_WAREHOUSES = [
-  { field: "k2_wh", label: "K2 WH" },
+  { field: "k2_wh", label: "WH1" },
   { field: "garcia", label: "Garcia" },
-  { field: "ca2_best", label: "CA2 best" },
-  { field: "cagl", label: "CAGL" },
+  { field: "ca2_best", label: "CA2" },
+  { field: "cagl", label: "MFY" },
   { field: "nj_best", label: "NJ BEST" },
-  { field: "ga2", label: "GA2" }
+  { field: "ga2", label: "WH3" }
 ];
 
 const INVENTORY_SELECT_COLUMNS = "sku,k2_wh,eta,garcia,ca2_best,cagl,nj_best,ga2,updated_at";
