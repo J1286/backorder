@@ -6,6 +6,7 @@ function showDashboard() {
 
   // Automatically refresh price database status
   loadPriceDatabase();
+  loadInventoryDatabase();
 }
 
 function showOrders() {
