@@ -12,6 +12,7 @@ function showDashboard() {
 function showOrders() {
   document.getElementById("dashboardPage").style.display = "none";
   document.getElementById("ordersPage").style.display = "block";
+  document.getElementById("inventoryDatabasePanel").style.display = "none";
 }
 
 function updateDashboard() {
