@@ -172,8 +172,9 @@ tr.appendChild(skuCell);
 
     const etaCell = document.createElement("td");
     etaCell.textContent = row._notFound
-      ? "—"
-      : (row.eta == null ? "" : String(row.eta));
+    ? "—"
+    : formatInventoryETA(row.eta);
+
     tr.appendChild(etaCell);
 
     const statusCell = document.createElement("td");
@@ -389,4 +390,36 @@ async function highlightInStockOrderItemsOnLoad() {
     inventoryStockSkuSet = new Set();
     inventoryStockHighlightUntil = 0;
   }
+}
+
+
+function formatInventoryETA(value) {
+  if (value == null || String(value).trim() === "") return "";
+
+  const text = String(value).trim();
+
+  // Remove a time portion such as "00:00:00" or "T12:34:56".
+  const dateOnly = text.split(/[T ]/)[0];
+
+  // Convert YYYY-MM-DD to "Oct 18 2026" without timezone shifts.
+  const match = dateOnly.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+
+  if (match) {
+    const [, year, month, day] = match;
+    const date = new Date(
+      Number(year),
+      Number(month) - 1,
+      Number(day),
+      12
+    );
+
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric"
+    });
+  }
+
+  // For values already formatted as "Oct 18 2026", keep them.
+  return dateOnly;
 }
