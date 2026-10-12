@@ -129,12 +129,17 @@ document.addEventListener("DOMContentLoaded", async () => {
   await checkLogin();
 });
 
+
 async function showApp() {
   document.getElementById("loginBox").style.display = "none";
   document.getElementById("app").style.display = "block";
 
   await loadOrders();
-  showOrders();
 
+  if (typeof highlightInStockOrderItemsOnLoad === "function") {
+    await highlightInStockOrderItemsOnLoad();
+  }
+
+  showOrders();
   startRealtime();
 }
