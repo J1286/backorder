@@ -118,10 +118,33 @@ function renderInventoryResults(rows) {
 
   for (const row of rows) {
     const tr = document.createElement("tr");
+ 
+const skuCell = document.createElement("td");
+const skuButton = document.createElement("button");
 
-    const skuCell = document.createElement("td");
-    skuCell.textContent = row.sku || "";
-    tr.appendChild(skuCell);
+skuButton.type = "button";
+skuButton.textContent = row.sku || "";
+skuButton.title = "Click to copy SKU";
+skuButton.style.cssText =
+  "background:none;border:0;padding:0;color:inherit;" +
+  "font:inherit;text-decoration:underline;cursor:pointer;";
+
+skuButton.addEventListener("click", async () => {
+  try {
+    await navigator.clipboard.writeText(row.sku || "");
+    const originalText = skuButton.textContent;
+    skuButton.textContent = "Copied!";
+    setTimeout(() => {
+      skuButton.textContent = originalText;
+    }, 1000);
+  } catch (error) {
+    // Fallback for browsers where Clipboard API is unavailable.
+    window.prompt("Copy this SKU:", row.sku || "");
+  }
+});
+
+skuCell.appendChild(skuButton);
+tr.appendChild(skuCell);
 
     let hasStock = false;
 
