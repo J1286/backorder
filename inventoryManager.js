@@ -393,33 +393,53 @@ async function highlightInStockOrderItemsOnLoad() {
 }
 
 
+
 function formatInventoryETA(value) {
   if (value == null || String(value).trim() === "") return "";
 
-  const text = String(value).trim();
-
-  // Remove a time portion such as "00:00:00" or "T12:34:56".
-  const dateOnly = text.split(/[T ]/)[0];
-
-  // Convert YYYY-MM-DD to "Oct 18 2026" without timezone shifts.
-  const match = dateOnly.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
-
-  if (match) {
-    const [, year, month, day] = match;
-    const date = new Date(
-      Number(year),
-      Number(month) - 1,
-      Number(day),
-      12
+  // Excel may provide dates as serial numbers.
+  if (typeof value === "number" && value > 0) {
+    const date = new Date(Date.UTC(1899, 11, 30) + value * 86400000);
+    return formatDateParts(
+      date.getUTCFullYear(),
+      date.getUTCMonth(),
+      date.getUTCDate()
     );
-
-    return date.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric"
-    });
   }
 
-  // For values already formatted as "Oct 18 2026", keep them.
-  return dateOnly;
+  const text = String(value).trim();
+
+  // Handle YYYY-MM-DD and ISO timestamps without timezone shifts.
+  const iso = text.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if (iso) {
+    return formatDateParts(
+      Number(iso[1]),
+      Number(iso[2]) - 1,
+      Number(iso[3])
+    );
+  }
+
+  // Handle dates like "Sun Oct 18 2026 ..." or "Oct 18, 2026 ...".
+  const parsed = new Date(text);
+  if (!Number.isNaN(parsed.getTime())) {
+    return formatDateParts(
+      parsed.getFullYear(),
+      parsed.getMonth(),
+      parsed.getDate()
+    );
+  }
+
+  // If we can't reliably parse it, preserve the original value.
+  return text;
+}
+
+function formatDateParts(year, monthIndex, day) {
+  const month = [
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+  ][monthIndex];
+
+  return month
+    ? `${month} ${day} ${year}`
+    : "";
 }
