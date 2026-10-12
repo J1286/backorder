@@ -94,6 +94,7 @@ function clearInventoryResults(message = "Enter a SKU to search inventory.") {
   if (status) status.textContent = message;
 }
 
+
 function renderInventoryResults(rows) {
   const header = document.getElementById("inventoryResultsHeader");
   const body = document.getElementById("inventoryResultsBody");
@@ -102,7 +103,13 @@ function renderInventoryResults(rows) {
   header.replaceChildren();
   body.replaceChildren();
 
-  const headers = ["SKU", ...INVENTORY_WAREHOUSES.map(warehouse => warehouse.label), "ETA"];
+  const headers = [
+    "SKU",
+    ...INVENTORY_WAREHOUSES.map(warehouse => warehouse.label),
+    "ETA",
+    "Stock Status"
+  ];
+
   for (const label of headers) {
     const th = document.createElement("th");
     th.textContent = label;
@@ -111,22 +118,55 @@ function renderInventoryResults(rows) {
 
   for (const row of rows) {
     const tr = document.createElement("tr");
+
     const skuCell = document.createElement("td");
     skuCell.textContent = row.sku || "";
     tr.appendChild(skuCell);
 
+    let hasStock = false;
+
     for (const warehouse of INVENTORY_WAREHOUSES) {
       const td = document.createElement("td");
       let quantity = 0;
-      try { quantity = inventoryQuantity(row[warehouse.field]); } catch (_) { quantity = 0; }
+
+      if (!row._notFound) {
+        try {
+          quantity = inventoryQuantity(row[warehouse.field]);
+        } catch (_) {
+          quantity = 0;
+        }
+      }
+
+      if (quantity > 0) hasStock = true;
+
       td.textContent = quantity > 0 ? String(quantity) : "—";
-      td.className = quantity > 0 ? "inventory-in-stock" : "inventory-out-of-stock";
+      td.className = quantity > 0
+        ? "inventory-in-stock"
+        : "inventory-out-of-stock";
+
       tr.appendChild(td);
     }
 
     const etaCell = document.createElement("td");
-    etaCell.textContent = row.eta == null ? "" : String(row.eta);
+    etaCell.textContent = row._notFound
+      ? "—"
+      : (row.eta == null ? "" : String(row.eta));
     tr.appendChild(etaCell);
+
+    const statusCell = document.createElement("td");
+
+    if (row._notFound) {
+      statusCell.textContent = "NOT FOUND";
+      statusCell.className = "inventory-out-of-stock";
+    } else if (hasStock) {
+      statusCell.textContent = "IN STOCK";
+      statusCell.className = "inventory-in-stock";
+    } else {
+      statusCell.textContent = "OUT OF STOCK";
+      statusCell.className = "inventory-out-of-stock";
+    }
+
+    tr.appendChild(statusCell);
     body.appendChild(tr);
   }
 }
@@ -134,42 +174,134 @@ function renderInventoryResults(rows) {
 async function searchInventory() {
   const input = document.getElementById("inventorySearchInput");
   const query = String(input?.value ?? "").trim();
+
   if (!query) {
-    clearInventoryResults("Enter a SKU to search inventory.");
+    clearInventoryResults("Enter one or more SKUs to search.");
     return;
   }
 
-  if (isExcludedInventorySku(query)) {
-    clearInventoryResults("SKUs ending in -KS are excluded from inventory.");
+  // Accept SKUs copied from Excel columns, including tabs and newlines.
+  const skus = [
+    ...new Set(
+      query
+        .split(/[\s,;]+/)
+        .map(normalizeInventorySku)
+        .filter(Boolean)
+    )
+  ];
+
+  const excludedSkus = skus.filter(isExcludedInventorySku);
+  const requestedSkus = skus.filter(
+    sku => !isExcludedInventorySku(sku)
+  );
+
+  if (requestedSkus.length === 0) {
+    clearInventoryResults(
+      `${excludedSkus.length} -KS SKU(s) excluded from inventory search.`
+    );
     return;
   }
 
   const status = document.getElementById("inventorySearchStatus");
-  if (status) status.textContent = "🟡 Searching...";
+  if (status) status.textContent = "🟡 Searching inventory...";
 
   try {
     const client = getInventorySupabase();
     if (!client) throw new Error("Supabase client is not available.");
-    const { data, error } = await client
-      .from("inventory")
-      .select(INVENTORY_SELECT_COLUMNS)
-      .ilike("sku", `%${query.replace(/[%_]/g, "\\$&")}%`)
-      .order("sku", { ascending: true })
-      .limit(100);
-    if (error) throw error;
 
-    const rows = (data || []).filter(row => !isExcludedInventorySku(row.sku));
-    renderInventoryResults(rows);
+    // Keep the original partial-match behavior for one SKU.
+    if (skus.length === 1) {
+      const { data, error } = await client
+        .from("inventory")
+        .select(INVENTORY_SELECT_COLUMNS)
+        .ilike("sku", `%${requestedSkus[0].replace(/[%_]/g, "\\$&")}%`)
+        .order("sku", { ascending: true })
+        .limit(100);
+
+      if (error) throw error;
+
+      const rows = (data || []).filter(
+        row => !isExcludedInventorySku(row.sku)
+      );
+
+      renderInventoryResults(rows);
+
+      if (status) {
+        status.textContent = rows.length
+          ? `🟢 Found ${rows.length} matching SKU(s). Quantities above zero are in stock.`
+          : "No matching inventory SKU found.";
+      }
+
+      return;
+    }
+
+    // Batch mode: exact SKU lookup in groups of 100.
+    const foundRows = [];
+
+    for (let i = 0; i < requestedSkus.length; i += 100) {
+      const batch = requestedSkus.slice(i, i + 100);
+
+      const { data, error } = await client
+        .from("inventory")
+        .select(INVENTORY_SELECT_COLUMNS)
+        .in("sku", batch);
+
+      if (error) throw error;
+
+      foundRows.push(
+        ...(data || []).filter(
+          row => !isExcludedInventorySku(row.sku)
+        )
+      );
+    }
+
+    const rowsBySku = new Map(
+      foundRows.map(row => [
+        normalizeInventorySku(row.sku),
+        row
+      ])
+    );
+
+    // Keep the same order as the pasted list, including missing SKUs.
+    const results = requestedSkus.map(sku => {
+      return rowsBySku.get(sku) || {
+        sku,
+        k2_wh: 0,
+        eta: null,
+        garcia: 0,
+        ca2_best: 0,
+        cagl: 0,
+        nj_best: 0,
+        ga2: 0,
+        _notFound: true
+      };
+    });
+
+    renderInventoryResults(results);
+
+    const foundCount = requestedSkus.filter(
+      sku => rowsBySku.has(sku)
+    ).length;
+
+    const missingCount = requestedSkus.length - foundCount;
+
     if (status) {
-      status.textContent = rows.length
-        ? `🟢 Found ${rows.length} matching SKU${rows.length === 1 ? "" : "s"}${rows.length === 100 ? " (showing up to 100)" : ""}. Quantities above zero are in stock.`
-        : "No matching inventory SKU found.";
+      status.textContent =
+        `🟢 ${foundCount} of ${requestedSkus.length} requested SKUs found.` +
+        (missingCount ? ` ${missingCount} not found.` : "") +
+        (excludedSkus.length
+          ? ` ${excludedSkus.length} -KS SKU(s) excluded.`
+          : "") +
+        " Results follow your pasted order.";
     }
   } catch (error) {
     console.error("Inventory search failed:", error);
-    clearInventoryResults(`🔴 Inventory search failed: ${error.message || error}`);
+    clearInventoryResults(
+      `🔴 Inventory search failed: ${error.message || error}`
+    );
   }
 }
+
 
 // Allow Enter in the search field to trigger a search without changing existing UI code.
 document.addEventListener("DOMContentLoaded", () => {
