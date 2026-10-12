@@ -327,6 +327,18 @@ function renderTable() {
       td.dataset.id = row._id;
       td.dataset.col = colIndex;
 
+      // Temporarily highlight Item ID cells whose SKU has stock.
+      if (
+        /^Item ID \d+$/.test(col) &&
+        Date.now() < inventoryStockHighlightUntil
+      ) {
+        const sku = normalizeInventorySku(row[col]);
+
+        if (sku && inventoryStockSkuSet.has(sku)) {
+          td.classList.add("inventory-stock-flash");
+        }
+      }
+
       // Highlight duplicates only in Tr.Orig.No.
       if (col === "Tr.Orig.No.") {
         const key = (row[col] || "").trim().toLowerCase();
