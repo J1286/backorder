@@ -1,11 +1,10 @@
 function showDashboard() {
   document.getElementById("dashboardPage").style.display = "block";
-  document.getElementById("inventoryDatabasePanel").style.display = "block";
   document.getElementById("ordersPage").style.display = "none";
 
   updateDashboard();
 
-  // Automatically refresh price database status
+  // Automatically refresh database statuses
   loadPriceDatabase();
   loadInventoryDatabase();
 }
@@ -13,7 +12,6 @@ function showDashboard() {
 function showOrders() {
   document.getElementById("dashboardPage").style.display = "none";
   document.getElementById("ordersPage").style.display = "block";
-  document.getElementById("inventoryDatabasePanel").style.display = "none";
 }
 
 function updateDashboard() {
