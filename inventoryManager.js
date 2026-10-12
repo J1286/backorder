@@ -178,3 +178,60 @@ document.addEventListener("DOMContentLoaded", () => {
     if (event.key === "Enter") searchInventory();
   });
 });
+
+
+/* ===== Temporary stock highlights in Orders ===== */
+
+let inventoryStockSkuSet = new Set();
+let inventoryStockHighlightUntil = 0;
+let inventoryStockHighlightTimer = null;
+
+async function highlightInStockOrderItemsOnLoad() {
+  try {
+    // Load inventory only after the user has logged in.
+    const rows = await loadAllInventoryRows();
+    const inStockSkus = new Set();
+
+    for (const row of rows) {
+      const sku = normalizeInventorySku(row.sku);
+
+      if (!sku || isExcludedInventorySku(sku)) continue;
+
+      // A SKU is in stock if ANY warehouse has quantity > 0.
+      const inStock = INVENTORY_WAREHOUSES.some((warehouse) => {
+        const quantity = inventoryQuantity(row[warehouse.field]);
+        return quantity > 0;
+      });
+
+      if (inStock) inStockSkus.add(sku);
+    }
+
+    inventoryStockSkuSet = inStockSkus;
+
+    // Start the five-second window after the inventory check completes.
+    inventoryStockHighlightUntil = Date.now() + 5000;
+
+    if (inventoryStockHighlightTimer) {
+      clearTimeout(inventoryStockHighlightTimer);
+    }
+
+    // Re-render the order table with matching Item ID cells highlighted.
+    renderTable();
+
+    inventoryStockHighlightTimer = setTimeout(() => {
+      inventoryStockHighlightUntil = 0;
+
+      document
+        .querySelectorAll("#tableBody td.inventory-stock-flash")
+        .forEach((cell) => {
+          cell.classList.remove("inventory-stock-flash");
+        });
+    }, 5000);
+
+  } catch (error) {
+    // An inventory lookup failure must not prevent the Orders page working.
+    console.error("Could not check inventory for order highlights:", error);
+    inventoryStockSkuSet = new Set();
+    inventoryStockHighlightUntil = 0;
+  }
+}
