@@ -433,13 +433,21 @@ function formatInventoryETA(value) {
   return text;
 }
 
+
 function formatDateParts(year, monthIndex, day) {
+  // Add 7 calendar days to the ETA for display.
+  const date = new Date(Date.UTC(year, monthIndex, day + 7));
+
+  const adjustedYear = date.getUTCFullYear();
+  const adjustedMonth = date.getUTCMonth();
+  const adjustedDay = date.getUTCDate();
+
   const month = [
     "Jan", "Feb", "Mar", "Apr", "May", "Jun",
     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-  ][monthIndex];
+  ][adjustedMonth];
 
   return month
-    ? `${month} ${day} ${year}`
+    ? `${month} ${adjustedDay} ${adjustedYear}`
     : "";
 }
