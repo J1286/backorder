@@ -466,6 +466,7 @@ function getNoteClass(note) {
   if (n === "HOLD") return "note-hold";
   if (n === "WAIT TO RECEIVE") return "note-wait";
   if (n === "STOCK ORDER") return "note-wait";
+  if (n === "SFI/CA3/IDC") return "note-wait";
 
   return null;
 }
